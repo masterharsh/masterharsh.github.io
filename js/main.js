@@ -8,8 +8,7 @@ window.onload = () => {
   
     var INDEX = 0; 
     $("#chat-submit").click(function(e){
-      var msg = $("#chat-input").val(); 
-      synthVoice(msg,'en-US'); 
+      onChatSubmit(e) 
     });
 
     function onChatSubmit(e) {
@@ -176,7 +175,7 @@ const synth = window.speechSynthesis;
 const utterance = new SpeechSynthesisUtterance();
 function synthVoice(text, lang) {
     utterance.voice = synth.getVoices().filter(function(voice) { return voice.name == 'Google UK English Female'; })[0];
-    utterance.lang = utterance.voice.lang;
+    utterance.lang = 'en-US';
     utterance.text = text;
     synth.speak(utterance);
   }
