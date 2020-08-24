@@ -176,8 +176,8 @@ const utterance = new SpeechSynthesisUtterance();
 function synthVoice(text, lang) {
     utterance.voice = synth.getVoices().filter(function(voice) { return voice.name == 'Google UK English Female'; })[0];
     utterance.lang = utterance.voice.lang;
-    utterance.text = text;
-    synth.speak("hello");
+    utterance.text = "hello";
+    synth.speak(utterance);
   }
   
 //   document.querySelector('.speak').addEventListener('click', () => {
