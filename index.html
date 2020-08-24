@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Hello World</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="images/hello-icon-152.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="white"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Hello World">
+  <meta name="msapplication-TileImage" content="images/hello-icon-144.png">
+  <meta name="msapplication-TileColor" content="#FFFFFF">
+</head>
+<body class="fullscreen">
+  <div class="container">
+     
+        <div class="chat-box">
+            <header class="chat-box-header">
+            ChatBot
+            </header>
+            <div class="chat-box-body">
+            <div class="chat-box-overlay">   
+            </div>
+            <div class="chat-logs">
+            
+            </div><!--chat-log -->
+            </div>
+            <div class="chat-input">      
+                <div>
+                      
+                        <span class="output_log"></span>
+                      
+                        <p class="output"></p>
+                  </div>
+            <div>
+                <input type="text" id="chat-input" placeholder="Send a message..."/>
+                <!-- <button class="speak">Let me speak for you!</button> -->
+                <button id="mic-btn" ><img src="./images/mute.svg"/></button>
+                <button class="chat-submit" id="chat-submit"><i class="material-icons">Send</i></button>
+            </div>      
+            </div>
+            
+           
+        </div>      
+    </div>
+</div>
+  <script src="./js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
+</body>
+</html>
