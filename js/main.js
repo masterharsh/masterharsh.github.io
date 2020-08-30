@@ -7,8 +7,11 @@ window.onload = () => {
     }
   
     var INDEX = 0; 
+
     $("#chat-submit").click(function(e){
-      onChatSubmit(e) 
+      onChatSubmit(e);
+      var text =  $('#chat-input').val();
+      fetchCommandResponse(text,previousMessage); 
     });
 
     function onChatSubmit(e) {
@@ -28,28 +31,7 @@ window.onload = () => {
               value: 'new'
             }
           ];
-        setTimeout(function() {      
-          generate_message(msg, 'user'); 
-          synthVoice(msg,'en-US'); 
-         // $("#chat-input").val('');
-        //   $.ajax("http://pprpatha-1.subnet1phx1.devcecphx.oraclevcn.com:5002/api/tts", {
-        //   type: "POST",
-        //   async: false,
-        //   contentType: "application/json",
-        //   beforeSend: function(xhr) {
-        //       xhr.setRequestHeader('Access-Control-Allow-Origin', '*');niaJ@123@
-        //   },
-        //   data: JSON.stringify({"text": msg, "language_code": "en-us"}),
-        //   success: function(data) {
-        //     console.log(data);
-        //     var resAudio = new Audio("data:audio/wav;base64," + data.audio_content);
-        //     resAudio.play();
-        //   },
-        //   error: function(jqXHR, textStatus, errorThrown) {
-        //     console.log(errorThrown);
-        //   }
-        // });
-        }, 1)
+       
         
       }
     
@@ -124,43 +106,57 @@ window.onload = () => {
       $("#chat-circle").toggle('scale');
       $(".chat-box").toggle('scale');
     })
+
+    $(".clear-chat").click(function(e){
+      var chatLogs = document.getElementById('chatLogs');
+      chatLogs.innerHTML = "";
+    });
 /////////////////SPEECH RECOGNITION/////////////////////////////////////////////
 const log = document.querySelector('.output_log');
-//const output = document.querySelector('.output_result');
 
+var previousMessage = {};
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
+let recogLang = 'en-US';
 
 recognition.interimResults = false;
 recognition.maxAlternatives = 1;
 
 document.querySelector('#mic-btn').addEventListener('click', () => {
-  let recogLang = 'en-IN'; // document.querySelector('[name=lang]:checked');
-  recognition.lang = recogLang.value;
-  $('#mic-btn img').attr('src','./images/mic.svg')
-  recognition.start();
+  if ($('#mic-btn img').attr('src') === "./images/mute.svg") {
+      
+    $('#mic-btn img').attr('src','./images/mic.svg');
+   
+      recognition.lang = recogLang.value;
+     // recognition.continuous = true;
+      recognition.start();
+
+    } else {
+      $('#mic-btn img').attr('src','./images/mute.svg');
+      recognition.stop();
+    }
 });
 
 recognition.addEventListener('speechstart', () => {
-  log.textContent = 'Speech has been detected.';
+  // log.textContent = 'Speech has been detected.';
 });
 
 recognition.addEventListener('result', (e) => {
-  log.textContent= 'Result has been detected.';
-
   let last = e.results.length - 1;
   let text = e.results[last][0].transcript;
 
   //output.textContent = text;
-  
-  log.textContent = 'Confidence: ' + e.results[0][0].confidence;
+ // log.textContent = 'Confidence: ' + e.results[0][0].confidence;
   $('#chat-input').val(text);
-  onChatSubmit(e)
+  onChatSubmit(e);
+  fetchCommandResponse(text,previousMessage);
+
 });
 
 recognition.addEventListener('speechend', (e) => {
     $('#mic-btn img').attr('src','./images/mute.svg');
     recognition.stop();
+  
 });
 
 recognition.addEventListener('error', (e) => {
@@ -175,9 +171,18 @@ const synth = window.speechSynthesis;
 const utterance = new SpeechSynthesisUtterance();
 function synthVoice(text, lang) {
     utterance.voice = synth.getVoices().filter(function(voice) { return voice.name == 'Google UK English Female'; })[0];
-    utterance.lang = 'en-US';
+    utterance.lang = lang;
     utterance.text = text;
+    console.log(utterance);
     synth.speak(utterance);
+    let r = setInterval(() => {
+      console.log(synth.speaking);
+      if (!synth.speaking) {
+        clearInterval(r);
+      } else {
+        synth.resume();
+      }
+    }, 14000);
   }
   
 //   document.querySelector('.speak').addEventListener('click', () => {
@@ -185,8 +190,73 @@ function synthVoice(text, lang) {
 //     let text = i.value || i.placeholder;
 //     synthVoice(text,'en-US');
 //   });
-  
 
+
+/////////////////////////////API CALLS/////////////////////////////////////////////
+$.ajax("http://pprpatha-1.subnet1phx1.devcecphx.oraclevcn.com:5002/api/greetings", {
+          type: "POST",
+          async: false,
+          contentType: "application/json",
+          beforeSend: function(xhr) {
+              xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
+          },
+          data: JSON.stringify( {"message": "harsh"} ),
+          success: function(data) {
+            console.log(data);
+            window.setTimeout(()=> {
+              synthVoice(data.message.message, recogLang);
+              generate_message(data.message.message, 'user');
+          },3000);
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            console.log(errorThrown);
+          }
+        });
+
+
+function fetchCommandResponse(textInput, data){
+  var messageObject = {
+    "data": data,
+    "text" : textInput
   }
+
+  if (textInput.indexOf("stop")!== -1){
+    console.log("stop");
+    synth.cancel();
+    $('#chat-input').val('');
+  }
+
+  $.ajax("http://pprpatha-1.subnet1phx1.devcecphx.oraclevcn.com:5002/api/workflow", {
+          type: "POST",
+          async: false,
+          contentType: "application/json",
+          beforeSend: function(xhr) {
+              xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
+          },
+          data: JSON.stringify( messageObject ),
+          success: function(data) {
+            console.log(data);
+           //synthVoice(data.result.message, 'en-US');
+           previousMessage = data;
+            if( data.result && data.result.message !== ""){
+              generate_message(data.result.message, 'user'); 
+              synthVoice(data.result.message,recogLang); 
+              $('#chat-input').val('');
+            } else {
+              var defaultMessage = "I am sorry, I think I did not understand."
+              generate_message(defaultMessage, 'user'); 
+              synthVoice(defaultMessage,recogLang);
+              $('#chat-input').val('');
+            }
+            
+    
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            console.log(errorThrown);
+          }
+        });
+    }        
+
+}
 
  
