@@ -239,9 +239,12 @@ function fetchCommandResponse(textInput, data){
            //synthVoice(data.result.message, 'en-US');
            previousMessage = data;
             if( data.result && data.result.message !== ""){
-              generate_message(data.result.message, 'user'); 
-              synthVoice(data.result.message,recogLang); 
-              $('#chat-input').val('');
+              window.setTimeout( function(){
+                generate_message(data.result.message, 'user'); 
+                synthVoice(data.result.message,recogLang); 
+                $('#chat-input').val('');
+              }, 1000);
+             
             } else {
               var defaultMessage = "I am sorry, I think I did not understand."
               generate_message(defaultMessage, 'user'); 
