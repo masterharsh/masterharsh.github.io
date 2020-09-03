@@ -85,7 +85,7 @@ window.onload = () => {
       if( result.description){
         str += `<tr><td colspan = "2">${result.description }<\/td><\/td><tr>`;
       }  else if(result.image_url )     {
-        str += `<tr><td colspan = "2"><img src = ${image}><\/td><\/td><tr>`;
+        str += `<tr><td colspan = "2"><img src = ${result.image_url}><\/td><\/td><tr>`;
       } 
 
       for(var i=0; i<list.length; i++){
