@@ -201,6 +201,19 @@ body {
     margin-bottom:20px;
     border-radius:30px;
   }
+
+  .cm-msgList-text {
+    background:white;
+    padding:10px 15px 10px 15px;  
+    color:#666;
+    max-width:75%;
+    float:left;
+    margin-left:10px; 
+    position:relative;
+    margin-bottom:20px;
+    /* border-radius:30px; */
+  }
+
   .chat-msg {
     clear:both;    
   }
@@ -253,6 +266,40 @@ body {
 
   .app-icon img{
     width: 1.5em;
+  }
+
+  table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    min-width: 150px;
+    width:100%;
+    max-width: 750px;
+  }
+  
+  th {
+    text-align: center;
+    padding: 8px;
+    font-weight: bold;
+  }
+
+  td{
+    border-bottom: 1px solid #e5cfcf;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #f5f4f2;
+  }
+
+  .approval-btn{
+    border: none;
+    padding: 10px;
+  }
+
+  #messageList img{
+    width: 100%;
+    max-width: 500px;
   }
     
   /* /////////////////RESPONSIVE//////////////////// */

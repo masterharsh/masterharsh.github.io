@@ -20,7 +20,7 @@ window.onload = () => {
         if(msg.trim() == ''){
           return false;
         }
-        generate_message(msg, 'self');
+        //generate_message(msg, 'self');
         var buttons = [
             {
               name: 'Existing User',
@@ -46,19 +46,65 @@ window.onload = () => {
       str += "          <\/div>";
       str += "        <\/div>";
       $(".chat-logs").append(str);
-      $("#cm-msg-"+INDEX).hide().fadeIn(300);
-    //   if(type == 'self'){
-    //    $("#chat-input").val(''); 
-    //   }    
+      $("#cm-msg-"+INDEX).hide().fadeIn(300);   
       $(".chat-logs").stop().animate({ scrollTop: $(".chat-logs")[0].scrollHeight}, 1000);    
     }  
+
+    function generate_list_message(result, type) {
+      var list = result.list_name;
+      INDEX++;
+      var str="";
+      str += `<div id='cm-msg-"+INDEX+"' class=\"chat-msg "+type+"\">
+                <span class=\"msg-avatar\"><\/span>
+                <div class=\"cm-msgList-text\">
+                  <table id='messageList'>
+                    <th width="100px">Items</th>`
+
+      for(var i=0; i<list.length; i++){
+        str += `<tr><td><span> ${i+1}. <\/span> ${list[i]}<\/tr><\/td>`
+        }
+
+      str += ` <\/table><\/div><\/div>`
+      
+      $(".chat-logs").append(str);
+      $("#cm-msg-"+INDEX).hide().fadeIn(300);   
+      $(".chat-logs").stop().animate({ scrollTop: $(".chat-logs")[0].scrollHeight}, 1000);    
+    }
+
+    function generate_image_message(result, type) {
+      var list = result.approve_list;
+      var image = 'https://images-na.ssl-images-amazon.com/images/I/61d6m8%2BIjTL._AC_SX425_.jpg'; //result.image_url
+      INDEX++;
+      var str = "";
+      str += `<div id='cm-msg-"+INDEX+"' class=\"chat-msg "+type+"\">
+                <span class=\"msg-avatar\"><\/span>
+                <div class=\"cm-msgList-text\">
+                  <table id='messageList'>
+                    <th width="100%">Title: ${result.title}</th>`;
+
+      if( result.description){
+        str += `<tr><td colspan = "2">${result.description }<\/td><\/td><tr>`;
+      }  else if(result.image_url )     {
+        str += `<tr><td colspan = "2"><img src = ${image}><\/td><\/td><tr>`;
+      } 
+
+      for(var i=0; i<list.length; i++){
+        str += `<td><button class="approval-btn"> ${list[i]}</button><\/td>`
+        }
+
+      str += `<\/tr><\/table><\/div><\/div>`
+      
+      $(".chat-logs").append(str);
+      $("#cm-msg-"+INDEX).hide().fadeIn(300);   
+      $(".chat-logs").stop().animate({ scrollTop: $(".chat-logs")[0].scrollHeight}, 1000);    
+    }
     
-    $(document).delegate(".chat-btn", "click", function() {
-      var value = $(this).attr("chat-value");
-      var name = $(this).html();
-      $("#chat-input").attr("disabled", false);
-      generate_message(name, 'self');
-    })
+    // $(document).delegate(".chat-btn", "click", function() {
+    //   var value = $(this).attr("chat-value");
+    //   var name = $(this).html();
+    //   $("#chat-input").attr("disabled", false);
+    //   generate_message(name, 'self');
+    // })
     
     $("#chat-circle").click(function() {    
       $("#chat-circle").toggle('scale');
@@ -209,9 +255,30 @@ function fetchCommandResponse(textInput, data){
         previousMessage = data;
         if(data.result && data.result.message !== ""){
             window.setTimeout( function(){
-              generate_message(data.result.message, 'user'); 
+              if( data.result.item_view ){
+              switch (data.result.item_view) {
+                case "Item1": 
+                      if( data.result.list_name.length > 0){
+                        generate_list_message(data.result, 'user'); 
+                      }
+                      if(data.result.approve_list.length > 0){
+                        generate_image_message(data.result, 'user');
+                      }
+                      break;
+                case "DigitalAsset": 
+                      if(data.result.approve_list.length > 0){
+                        generate_image_message(data.result, 'user');
+                      }
+                      break;
+                default:
+                      console.log("default");
+                      generate_message("I could not find anything!", 'user');
+              }
+            }
+                
+              $('#chat-input').val("Assistant : " + data.result.message);
               synthVoice(data.result.message,recogLang); 
-              $('#chat-input').val('');
+             
             }, 1000);
           } else {
             var defaultMessage = "I am sorry, I think I did not understand."
