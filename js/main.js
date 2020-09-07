@@ -184,11 +184,10 @@ recognition.addEventListener('error', (e) => {
 const synth = window.speechSynthesis;  
 const utterance = new SpeechSynthesisUtterance();
 function synthVoice(text, lang) {
-    utterance.voice = synth.getVoices().filter(function(voice) { return voice.name == 'Google UK English Female'; })[0];
+    utterance.voice = synth.getVoices().filter(function(voice) { return voice.name == 'Microsoft Zira Desktop - English (United States)'; })[0];
     utterance.lang = lang;
     utterance.text = text;
     utterance.rate = 0.9;
-    console.log(utterance);
     synth.speak(utterance);
     let r = setInterval(() => {
       console.log(synth.speaking);
@@ -241,6 +240,9 @@ function fetchCommandResponse(textInput, data){
     //$('#chat-input').val(textInput);
   } else if (textInput.indexOf( "pause" )!== -1) {
     synth.pause();
+  } else if (textInput.indexOf( "repeat" )!== -1) {
+    synth.speak(utterance);
+    $('#chat-input').val(utterance.text);
   } else {
       $.ajax("http://pprpatha-1.subnet1phx1.devcecphx.oraclevcn.com:5002/api/workflow", {
         type: "POST",
@@ -277,6 +279,17 @@ function fetchCommandResponse(textInput, data){
                       break;
                 case "DigitalAsset": 
                       if(data.result.approve_list.length > 0){
+                        clearChat();
+                        generate_image_message(data.result, 'user');
+                      }
+                      break;
+                case "blog": 
+                      if (data.result.blog_flag && data.result.list_name.length > 0) {
+                        clearChat();
+                        generate_list_message(data.result, 'user');
+                      }
+
+                      if (data.result.blog_flag && data.result.list_name.length === 0) {
                         clearChat();
                         generate_image_message(data.result, 'user');
                       }
