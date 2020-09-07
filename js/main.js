@@ -73,7 +73,7 @@ window.onload = () => {
 
     function generate_image_message(result, type) {
       var list = result.approve_list;
-      var image = 'https://images-na.ssl-images-amazon.com/images/I/61d6m8%2BIjTL._AC_SX425_.jpg'; //result.image_url
+      var image = result.image_url; //'https://images-na.ssl-images-amazon.com/images/I/61d6m8%2BIjTL._AC_SX425_.jpg'; 
       INDEX++;
       var str = "";
       str += `<div id='cm-msg-"+INDEX+"' class=\"chat-msg "+type+"\">
@@ -85,7 +85,7 @@ window.onload = () => {
       if( result.description){
         str += `<tr><td colspan = "2">${result.description }<\/td><\/td><tr>`;
       }  else if(result.image_url )     {
-        str += `<tr><td colspan = "2"><img src = ${result.image_url}><\/td><\/td><tr>`;
+        str += `<tr><td colspan = "2"><img src = ${image}><\/td><\/td><tr>`;
       } 
 
       for(var i=0; i<list.length; i++){
@@ -97,6 +97,12 @@ window.onload = () => {
       $(".chat-logs").append(str);
       $("#cm-msg-"+INDEX).hide().fadeIn(300);   
       $(".chat-logs").stop().animate({ scrollTop: $(".chat-logs")[0].scrollHeight}, 1000);    
+    }
+
+    function clearChat(){
+      var chatLogs = document.getElementById('chatLogs');
+      chatLogs.innerHTML = "";
+      $('#chat-input').val('');
     }
     
     // $(document).delegate(".chat-btn", "click", function() {
@@ -117,9 +123,7 @@ window.onload = () => {
     })
 
     $(".clear-chat").click(function(e){
-      var chatLogs = document.getElementById('chatLogs');
-      chatLogs.innerHTML = "";
-      $('#chat-input').val('');
+      clearChat();
     });
 /////////////////SPEECH RECOGNITION/////////////////////////////////////////////
 const log = document.querySelector('.output_log');
@@ -171,7 +175,7 @@ recognition.addEventListener('speechend', (e) => {
 
 recognition.addEventListener('error', (e) => {
     $('#mic-btn img').attr('src','./images/mute.svg')
-    log.textContent = 'Error: ' + e.error;
+    console.log('Error: ' + e.error);
 });
 
 
@@ -183,6 +187,7 @@ function synthVoice(text, lang) {
     utterance.voice = synth.getVoices().filter(function(voice) { return voice.name == 'Google UK English Female'; })[0];
     utterance.lang = lang;
     utterance.text = text;
+    utterance.rate = 0.9;
     console.log(utterance);
     synth.speak(utterance);
     let r = setInterval(() => {
@@ -215,7 +220,8 @@ $.ajax("http://pprpatha-1.subnet1phx1.devcecphx.oraclevcn.com:5002/api/greetings
             console.log(data);
             window.setTimeout(()=> {
               synthVoice(data.message.message, recogLang);
-              generate_message(data.message.message, 'user');
+             // generate_message(data.message.message, 'user');
+             $('#chat-input').val("Assistant : " + data.message.message);
           },3000);
           },
           error: function(jqXHR, textStatus, errorThrown) {
@@ -232,7 +238,9 @@ function fetchCommandResponse(textInput, data){
 
   if (textInput.indexOf("stop")!== -1){
     synth.cancel();
-    $('#chat-input').val('');
+    //$('#chat-input').val(textInput);
+  } else if (textInput.indexOf( "pause" )!== -1) {
+    synth.pause();
   } else {
       $.ajax("http://pprpatha-1.subnet1phx1.devcecphx.oraclevcn.com:5002/api/workflow", {
         type: "POST",
@@ -259,19 +267,23 @@ function fetchCommandResponse(textInput, data){
               switch (data.result.item_view) {
                 case "Item1": 
                       if( data.result.list_name.length > 0){
+                        clearChat();
                         generate_list_message(data.result, 'user'); 
                       }
                       if(data.result.approve_list.length > 0){
+                        clearChat();
                         generate_image_message(data.result, 'user');
                       }
                       break;
                 case "DigitalAsset": 
                       if(data.result.approve_list.length > 0){
+                        clearChat();
                         generate_image_message(data.result, 'user');
                       }
                       break;
                 default:
                       console.log("default");
+                      clearChat();
                       generate_message("I could not find anything!", 'user');
               }
             }
@@ -282,6 +294,7 @@ function fetchCommandResponse(textInput, data){
             }, 1000);
           } else {
             var defaultMessage = "I am sorry, I think I did not understand."
+            clearChat();
             generate_message(defaultMessage, 'user'); 
             synthVoice(defaultMessage,recogLang);
             $('#chat-input').val('');
