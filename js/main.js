@@ -163,9 +163,10 @@ recognition.addEventListener('result', (e) => {
   let text = e.results[last][0].transcript;
 
   $('#chat-input').val(text);
-  onChatSubmit(e);
-  fetchCommandResponse(text,previousMessage);
-
+  window.setTimeout(() => {
+    onChatSubmit(e)
+  fetchCommandResponse(text,previousMessage)
+  ,1});
 });
 
 recognition.addEventListener('speechend', (e) => {
