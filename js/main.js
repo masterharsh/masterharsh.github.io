@@ -1,18 +1,13 @@
 window.onload = () => {
     'use strict';
-  
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
                .register('./sw.js');
     }
   
     var INDEX = 0; 
-
-    $("#chat-submit").click(function(e){
-      onChatSubmit(e);
-      var text =  $('#chat-input').val();
-      fetchCommandResponse(text,previousMessage); 
-    });
+//////////////////////////METHODS//////////////////////////////////////////
 
     function onChatSubmit(e) {
         e.preventDefault();
@@ -58,7 +53,7 @@ window.onload = () => {
                 <span class=\"msg-avatar\"><\/span>
                 <div class=\"cm-msgList-text\">
                   <table id='messageList'>
-                    <th width="100px">Items</th>`
+                    <th width="100px">Task List</th>`
 
       for(var i=0; i<list.length; i++){
         str += `<tr><td><span> ${i+1}. <\/span> ${list[i]}<\/tr><\/td>`
@@ -104,13 +99,9 @@ window.onload = () => {
       chatLogs.innerHTML = "";
       $('#chat-input').val('');
     }
-    
-    // $(document).delegate(".chat-btn", "click", function() {
-    //   var value = $(this).attr("chat-value");
-    //   var name = $(this).html();
-    //   $("#chat-input").attr("disabled", false);
-    //   generate_message(name, 'self');
-    // })
+
+   /////////////////////////////////////////////////////////////////////////////////////
+   //////////////////Event Listeners////////////////////////////////////////////////// 
     
     $("#chat-circle").click(function() {    
       $("#chat-circle").toggle('scale');
@@ -125,6 +116,19 @@ window.onload = () => {
     $(".clear-chat").click(function(e){
       clearChat();
     });
+    
+    $("#chat-submit").click(function(e){
+      onChatSubmit(e);
+      var text =  $('#chat-input').val();
+      fetchCommandResponse(text,previousMessage); 
+    });
+
+    $(".stop-speaking").click(function(e){
+      if(synth.speaking){
+        synth.cancel();
+      }
+    });
+
 /////////////////SPEECH RECOGNITION/////////////////////////////////////////////
 const log = document.querySelector('.output_log');
 
@@ -152,15 +156,12 @@ document.querySelector('#mic-btn').addEventListener('click', () => {
 });
 
 recognition.addEventListener('speechstart', () => {
-  // log.textContent = 'Speech has been detected.';
 });
 
 recognition.addEventListener('result', (e) => {
   let last = e.results.length - 1;
   let text = e.results[last][0].transcript;
 
-  //output.textContent = text;
- // log.textContent = 'Confidence: ' + e.results[0][0].confidence;
   $('#chat-input').val(text);
   onChatSubmit(e);
   fetchCommandResponse(text,previousMessage);
@@ -178,16 +179,16 @@ recognition.addEventListener('error', (e) => {
     console.log('Error: ' + e.error);
 });
 
-
+//////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////SPEECH SYNTHESIS/////////////////////////////////////////////
 
 const synth = window.speechSynthesis;  
 const utterance = new SpeechSynthesisUtterance();
 function synthVoice(text, lang) {
-    utterance.voice = synth.getVoices().filter(function(voice) { return voice.name == 'Microsoft Zira Desktop - English (United States)'; })[0];
+    utterance.voice = synth.getVoices().filter(function(voice) { return voice.name == 'Google UK English Female'; })[0];
     utterance.lang = lang;
     utterance.text = text;
-    utterance.rate = 0.9;
+    utterance.rate = 0.85;
     synth.speak(utterance);
     let r = setInterval(() => {
       console.log(synth.speaking);
@@ -198,13 +199,6 @@ function synthVoice(text, lang) {
       }
     }, 14000);
   }
-  
-//   document.querySelector('.speak').addEventListener('click', () => {
-//     let i = document.querySelector('#chat-input');
-//     let text = i.value || i.placeholder;
-//     synthVoice(text,'en-US');
-//   });
-
 
 /////////////////////////////API CALLS/////////////////////////////////////////////
 $.ajax("http://pprpatha-1.subnet1phx1.devcecphx.oraclevcn.com:5002/api/greetings", {
@@ -324,6 +318,7 @@ function fetchCommandResponse(textInput, data){
  
     }        
 
+///////////////////////////////////////////////////////////////////////////////////
 }
 
  

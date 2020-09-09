@@ -67,9 +67,7 @@ body {
   }
   .chat-box-header {
     background: #0097A7;
-    height:5vh;
-    border-top-left-radius:5px;
-    border-top-right-radius:5px; 
+    height:5vh; 
     color:white;
     text-align:center;
     font-size:20px;
@@ -259,7 +257,16 @@ body {
   }
 
   .clear-chat-img{
-    width: 25px;
+    width: 20px;
+  }
+
+  .stop-speaking{
+    position: fixed;
+    right: 50px;
+  }
+
+  .stop-speaking img{
+    width: 20px;
   }
 
   .app-icon{
@@ -268,7 +275,7 @@ body {
   }
 
   .app-icon img{
-    width: 1.5em;
+    width: 1.3em;
   }
 
   table {
@@ -277,6 +284,7 @@ body {
     min-width: 150px;
     width:100%;
     max-width: 750px;
+    font-size: 15px;
   }
   
   th {
