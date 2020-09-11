@@ -126,6 +126,7 @@ window.onload = () => {
     $(".stop-speaking").click(function(e){
       if(synth.speaking){
         synth.cancel();
+        $('#chat-input').val('');
       }
     });
 
@@ -301,7 +302,7 @@ function fetchCommandResponse(textInput, data){
              
             }, 1000);
           } else {
-            var defaultMessage = "I am sorry, I think I did not understand."
+            var defaultMessage = "I am sorry, I couldn't understand."
             clearChat();
             generate_message(defaultMessage, 'user'); 
             synthVoice(defaultMessage,recogLang);
